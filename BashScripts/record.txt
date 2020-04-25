@@ -1,0 +1,75 @@
+#!/bin/bash
+##RECORD
+su
+
+echo "!!!Entering a Number other than 1 to 7 will quit the program!!!"
+
+touch tmprec
+
+today = date | head -c 3
+
+for i in {1..15000..150}
+do
+
+if (head -$i /home/attendance.log | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
+then
+break
+fi
+
+done
+
+case $today in
+	Sun)
+		today = 1
+		;;
+	Mon)
+		today = 2
+		;;
+	Tue)
+		today = 3
+		;;
+	Wed)
+		today = 4
+		;;
+	Thu)
+		today = 5
+		;;
+	Fri)
+		today = 6
+	Sat)
+		today = 7
+		;;
+	*)
+		echo "Invalid"
+		exit
+		;;
+esac
+
+if ($today -eq $1)
+then
+attendance
+fi
+
+
+if ($today -gt $1)
+then
+i = $i-($today-$1)*150
+fi
+
+if ($today -lt $1)
+then
+i = $i-(7-$1+$today)*150
+fi
+
+for j in {1..50}
+do
+
+head -$i+$j-1 /home/attendance.log | tail -c +22 >> tmprec
+head -$i+$j /home/attendance.log | tail -c +22 >> tmprec
+head -$i+$j+1 /home/attendance.log | tail -c +22 >> tmprec
+
+done
+
+cat temprec
+
+rm temprec

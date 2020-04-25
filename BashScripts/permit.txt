@@ -1,0 +1,17 @@
+#!/bin/bash
+##PERMIT
+su
+
+groupadd Army
+groupadd Navy
+groupadd AirForce
+
+##sudo usermod -a -G sudo ChiefCommander
+
+chgrp ArmyGeneral /home/Army
+chgrp NavyMarshal /home/Navy
+chgrp NavyMarshal /home/AirForce
+
+chmod 660 /home/Army
+chmod 660 /home/Navy
+chmod 660 /home/AirForce

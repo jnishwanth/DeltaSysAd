@@ -1,0 +1,11 @@
+#!/bin/bash
+##BASHRCWRITER
+su
+
+echo "alias userGenerate=\'/home/userGenerate\'" >> ~./bashrc
+echo "alias permit=\'/home/permit\'" >> ~./bashrc
+echo "alias autoSchedule=\'/home/autoSchedule\'" >> ~./bashrc
+echo "alias attendance=\'/home/attendance\'" >> ~./bashrc
+echo "alias record=\'/home/record\'" >> ~./bashrc
+echo "@daily autoSchedule" >> crontab
+echo "00 06 * * * attendance" >> crontab

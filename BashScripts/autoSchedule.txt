@@ -1,0 +1,38 @@
+#!/bin/bash
+##AUTOSCHEDULE
+su
+
+j=1
+
+for j in {1..15000..150}
+do
+
+if (cat /home/position.log | head -$j | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
+then
+break
+fi
+
+done
+
+for i in {1..50}
+do
+
+touch -c /home/Army/Army$i/post_alloted
+head -$j+$i-1 /home/position.log | head -c 11 | tail -c 10 >> /home/Army/Army$i/post_alloted
+echo "   " >> /home/Army/Army$i/post_alloted
+head -$j+$i-1 /home/position.log | tail -c 23 >> /home/Army/Army$i/post_alloted
+echo "\n" >> /home/Army/Army$i/post_alloted
+
+touch -c /home/Navy/Navy$i/post_alloted
+head -$j+$i /home/position.log | head -c 11 | tail -c 10 >> /home/Navy/Navy$i/post_alloted
+echo "   " >> /home/Navy/Navy$i/post_alloted
+head -$j+$i /home/position.log | tail -c 23 >> /home/Navy/Navy$i/post_alloted
+echo "\n" >> /home/Navy/Navy$i/post_alloted
+
+touch -c /home/AirForce/AirForce$i/post_alloted
+head -$j+$i+1 /home/position.log | head -c 11 | tail -c 10 >> /home/Airforce/AirForce$i/post_alloted
+echo "   " >> /home/Airforce/AirForce$i/post_alloted
+head -$j+$i+1 /home/position.log | tail -c 23 >> /home/AirForce/AirForce$i/post_alloted
+echo "\n" >> /home/AirForce/AirForce$i/post_alloted
+
+done

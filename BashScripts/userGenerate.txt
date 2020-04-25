@@ -1,0 +1,17 @@
+#!/bin/bash
+#USERGENERATE
+su
+
+sudo adduser -m ChiefCommander sudo
+adduser -m -d /home/Army ArmyGeneral
+adduser -m -d /home/Navy NavyMarshal
+adduser -m -d /home/AirForce AirForceChief
+
+for i in {1..50}
+do
+
+adduser -m -d /home/Army Army$i
+adduser -m -d /home/Navy Navy$i
+adduser -m -d /home/AirForce AirForce$i
+
+done
