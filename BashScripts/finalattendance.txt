@@ -1,0 +1,42 @@
+#!/bin/bash
+##finalattendance
+
+armyatt = 0
+navyatt = 0
+airatt = 0
+
+cd /home/ChiefCommander
+
+touch attendance_report
+
+for j in {1..15000..3}
+do
+
+if (head -n $j /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+let "airatt = airatt + 1"
+fi
+
+if (head -n $j+1 /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+let "armyatt = armyatt + 1"
+fi
+
+if (head -n $j+2 /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+let "navyatt = navyatt + 1"
+fi
+
+if ( ((j%150 -eq 0) && (j/150 -eq 1)) || (j -eq 1) )
+then
+head -n $j /home/attendance.log | tail -n 1 | head -c 12 >> finalattendance
+printf "\n" >> finalattendance
+printf "Army attendance is $armyatt\n" >> finalattendance
+printf "Navy attendance is $navyatt\n" >> finalattendance
+printf "AirForce attendance is $airatt\n" >> finalattendance
+armyatt = 0
+navyatt = 0
+airatt = 0
+fi
+
+done
