@@ -1,0 +1,59 @@
+#!/bin/bash
+##NEAREST
+
+su
+
+touch tmpnearest10
+touch nearest10
+
+> tmpnearest10
+
+for i in {1..15000..150}
+do
+
+if (head -n $i /home/attendance.log |  tail -n 1 | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
+then
+break
+fi
+
+done
+
+for j in {1..150..3}
+do
+
+if (head -n $i+$j-1 /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+head -n $i+$j-1 /home/attendance.log |  tail -n 1 | tail -c +22 | head -c -6 >> tmpnearest10
+echo " " >> tmpnearest10
+x = head -n $i+$j-1 /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 1
+y = head -n $i+$j-1 /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 2
+let  "z = $x*$x + $y*$y"
+printf "\n" >> tmpnearest10
+fi
+
+if (head -n $i+$j /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+head -n $i+$j /home/attendance.log |  tail -n 1 | tail -c +22 | head -c -6 >> tmpnearest10
+echo " " >> tmpnearest10
+x = head -n $i+$j /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 1
+y = head -n $i+$j /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 2
+let  "z = $x*$x + $y*$y"
+printf "\n" >> tmpnearest10
+fi
+
+if (head -n $i+$j+1 /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+head -n $i+$j+1 /home/attendance.log |  tail -n 1 | tail -c +22 | head -c -6 >> tmpnearest10
+echo " " >> tmpnearest10
+x = head -n $i+$j+1 /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 1
+y = head -n $i+$j+1 /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 2
+let  "z = $x*$x + $y*$y"
+echo "$z" >> tmpnearest10
+printf "\n" >> tmpnearest10
+fi
+
+done
+
+sort -k 2 tmpnearest10 | head -n 10 > nearest10
+
+rm tmpnearest10

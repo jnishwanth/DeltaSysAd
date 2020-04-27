@@ -11,7 +11,7 @@ today = date | head -c 3
 for i in {1..15000..150}
 do
 
-if (head -$i /home/attendance.log | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
+if (head -n $i /home/attendance.log |  tail -n 1 | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
 then
 break
 fi
@@ -61,12 +61,15 @@ then
 i = $i-(7-$1+$today)*150
 fi
 
-for j in {1..50}
+for j in {1..150..50}
 do
 
-head -$i+$j-1 /home/attendance.log | tail -c +22 >> tmprec
-head -$i+$j /home/attendance.log | tail -c +22 >> tmprec
-head -$i+$j+1 /home/attendance.log | tail -c +22 >> tmprec
+head -n $i+$j-1 /home/attendance.log |  tail -n 1 | tail -c +22 >> tmprec
+printf "\n" >> tmprec
+head -n $i+$j /home/attendance.log |  tail -n 1 | tail -c +22 >> tmprec
+printf "\n" >> tmprec
+head -n $i+$j+1 /home/attendance.log |  tail -n 1 | tail -c +22 >> tmprec
+printf "\n" >> tmprec
 
 done
 

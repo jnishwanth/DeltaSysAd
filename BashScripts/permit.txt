@@ -10,7 +10,7 @@ groupadd AirForce
 
 chgrp ArmyGeneral /home/Army
 chgrp NavyMarshal /home/Navy
-chgrp NavyMarshal /home/AirForce
+chgrp AirForceChief /home/AirForce
 
 chmod 660 /home/Army
 chmod 660 /home/Navy
