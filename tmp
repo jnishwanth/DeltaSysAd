@@ -1,0 +1,319 @@
+#!/bin/bash
+##BASHRCWRITER
+su
+
+echo "alias userGenerate=\'/home/userGenerate\'" >> ~./bashrc
+echo "alias permit=\'/home/permit\'" >> ~./bashrc
+echo "alias autoSchedule=\'/home/autoSchedule\'" >> ~./bashrc
+echo "alias attendance=\'/home/attendance\'" >> ~./bashrc
+echo "alias record=\'/home/record\'" >> ~./bashrc
+echo "alias finalattendance=\'/home/finalattendance\'" >> ~./bashrc
+echo "alias nearest=\'/home/nearest\'" >> ~./bashrc
+echo "@daily autoSchedule" >> crontab
+echo "00 06 * * * attendance" >> crontab
+
+#!/bin/bash
+##USERGENERATE
+su
+
+sudo adduser -m ChiefCommander sudo
+adduser -m -d /home/Army ArmyGeneral
+adduser -m -d /home/Navy NavyMarshal
+adduser -m -d /home/AirForce AirForceChief
+
+for i in {1..50}
+do
+
+adduser -m -d /home/Army Army$i
+adduser -m -d /home/Navy Navy$i
+adduser -m -d /home/AirForce AirForce$i
+
+done
+
+#!/bin/bash
+##PERMIT
+su
+
+groupadd Army
+groupadd Navy
+groupadd AirForce
+
+##sudo usermod -a -G sudo ChiefCommander
+
+chgrp ArmyGeneral /home/Army
+chgrp NavyMarshal /home/Navy
+chgrp AirForceChief /home/AirForce
+
+chmod 660 /home/Army
+chmod 660 /home/Navy
+chmod 660 /home/AirForce
+
+#!/bin/bash
+##AUTOSCHEDULE
+su
+
+j=1
+
+for j in {1..15000..150}
+do
+
+if (cat /home/position.log | head -n $j | tail -n 1 | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
+then
+break
+fi
+
+done
+
+for i in {1..150..3}
+do
+
+touch -c -c /home/Army/Army$i/post_alloted
+head -n $j+$i-1 /home/position.log | tail -n 1 | head -c 11 | tail -c 10 >> /home/Army/Army$i/post_alloted
+echo "   " >> /home/Army/Army$i/post_alloted
+head -n $j+$i-1 /home/position.log | tail -n 1 |tail -c +22 >> /home/Army/Army$i/post_alloted
+printf "\n" >> /home/Army/Army$i/post_alloted
+
+touch -c -c /home/Navy/Navy$i/post_alloted
+head -n $j+$i /home/position.log | tail -n 1 | head -c 11 | tail -c 10 >> /home/Navy/Navy$i/post_alloted
+echo "   " >> /home/Navy/Navy$i/post_alloted
+head -n $j+$i /home/position.log |  tail -n 1 | tail -c +22 >> /home/Navy/Navy$i/post_alloted
+printf "\n" >> /home/Navy/Navy$i/post_alloted
+
+touch -c -c /home/AirForce/AirForce$i/post_alloted
+head -n $j+$i+1 /home/position.log |  tail -n 1 | head -c 11 | tail -c 10 >> /home/Airforce/AirForce$i/post_alloted
+echo "   " >> /home/Airforce/AirForce$i/post_alloted
+head -n $j+$i+1 /home/position.log |  tail -n 1 | tail -c +22 >> /home/AirForce/AirForce$i/post_alloted
+printf "\n" >> /home/AirForce/AirForce$i/post_alloted
+
+done
+
+
+
+#!/bin/bash
+##ATTENDANCE
+su
+
+touch -c -c /home/AirForce/AirForceChief/attendance_record
+touch -c -c /home/Army/ArmyGeneral/attendance_record
+touch -c -c /home/Navy/NavyMarshal/attendance_record
+
+> /home/AirForce/AirForceChief/attendance_record
+> /home/Army/ArmyGeneral/attendance_record
+> /home/Navy/NavyMarshal/attendance_record
+
+for i in {1..15000..150}
+do
+
+if (head -n $i /home/attendance.log |  tail -n 1 | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
+then
+break
+fi
+
+done
+
+
+for j in {1..150..3}
+do
+
+head -n $i+$j-1 /home/attendance.log |  tail -n 1 | tail -c +22 >> /home/AirForce/AirForceChief/attendance_record
+printf "\n" >> /home/AirForce/AirForceChief/attendance_record
+head -n $i+$j /home/attendance.log |  tail -n 1 | tail -c +22 >> /home/Army/ArmyGeneral/attendance_record
+printf "\n" >> /home/Army/ArmyGeneral/attendance_record
+head -n $i+$j+1 /home/attendance.log |  tail -n 1 | tail -c +22 >> /home/Navy/NavyMarshal/attendance_record
+printf "\n" >> /home/Navy/NavyMarshal/attendance_record
+
+done
+
+
+
+
+
+#!/bin/bash
+##RECORD
+su
+
+echo "!!!Entering a Number other than 1 to 7 will quit the program!!!"
+
+touch -c tmprec
+
+today = date | head -c 3
+
+for i in {1..15000..150}
+do
+
+if (head -n $i /home/attendance.log |  tail -n 1 | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
+then
+break
+fi
+
+done
+
+case $today in
+	Sun)
+		today = 1
+		;;
+	Mon)
+		today = 2
+		;;
+	Tue)
+		today = 3
+		;;
+	Wed)
+		today = 4
+		;;
+	Thu)
+		today = 5
+		;;
+	Fri)
+		today = 6
+	Sat)
+		today = 7
+		;;
+	*)
+		echo "Invalid"
+		exit
+		;;
+esac
+
+if ($today -eq $1)
+then
+attendance
+fi
+
+
+if ($today -gt $1)
+then
+i = $i-($today-$1)*150
+fi
+
+if ($today -lt $1)
+then
+i = $i-(7-$1+$today)*150
+fi
+
+for j in {1..150..50}
+do
+
+head -n $i+$j-1 /home/attendance.log |  tail -n 1 | tail -c +22 >> tmprec
+printf "\n" >> tmprec
+head -n $i+$j /home/attendance.log |  tail -n 1 | tail -c +22 >> tmprec
+printf "\n" >> tmprec
+head -n $i+$j+1 /home/attendance.log |  tail -n 1 | tail -c +22 >> tmprec
+printf "\n" >> tmprec
+
+done
+
+cat temprec
+
+rm temprec
+
+
+
+
+#!/bin/bash
+##finalattendance
+
+armyatt = 0
+navyatt = 0
+airatt = 0
+
+cd /home/ChiefCommander
+
+touch -c attendance_report
+
+for j in {1..15000..3}
+do
+
+if (head -n $j /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+let "airatt = airatt + 1"
+fi
+
+if (head -n $j+1 /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+let "armyatt = armyatt + 1"
+fi
+
+if (head -n $j+2 /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+let "navyatt = navyatt + 1"
+fi
+
+if ( ((j%150 -eq 0) && (j/150 -eq 1)) || (j -eq 1) )
+then
+head -n $j /home/attendance.log | tail -n 1 | head -c 12 >> finalattendance
+printf "\n" >> finalattendance
+printf "Army attendance is $armyatt\n" >> finalattendance
+printf "Navy attendance is $navyatt\n" >> finalattendance
+printf "AirForce attendance is $airatt\n" >> finalattendance
+armyatt = 0
+navyatt = 0
+airatt = 0
+fi
+
+done
+
+
+
+
+#!/bin/bash
+##NEAREST
+
+su
+
+touch -c tmpnearest10
+touch -c nearest10
+
+> tmpnearest10
+
+for i in {1..15000..150}
+do
+
+if (head -n $i /home/attendance.log |  tail -n 1 | head -c 11 | tail -c 10 == date +"%Y-%m-%d %T")
+then
+break
+fi
+
+done
+
+for j in {1..150..3}
+do
+
+if (head -n $i+$j-1 /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+head -n $i+$j-1 /home/attendance.log |  tail -n 1 | tail -c +22 | head -c -6 >> tmpnearest10
+echo " " >> tmpnearest10
+x = head -n $i+$j-1 /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 1
+y = head -n $i+$j-1 /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 2
+let  "z = ($x-28.7041)*($x-28.7041) + ($y-77.1025)*($y-77.1025)"
+echo "$z" >> tmpnearest10
+printf "\n" >> tmpnearest10
+fi
+
+if (head -n $i+$j /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+head -n $i+$j /home/attendance.log |  tail -n 1 | tail -c +22 | head -c -6 >> tmpnearest10
+echo " " >> tmpnearest10
+x = head -n $i+$j /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 1
+y = head -n $i+$j /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 2
+let  "z = ($x-28.7041)*($x-28.7041) + ($y-77.1025)*($y-77.1025)"
+echo "$z" >> tmpnearest10
+printf "\n" >> tmpnearest10
+fi
+
+if (head -n $i+$j+1 /home/attendance.log |  tail -n 1 | tail -c 4 | head -c 3 == "YES")
+then
+head -n $i+$j+1 /home/attendance.log |  tail -n 1 | tail -c +22 | head -c -6 >> tmpnearest10
+echo " " >> tmpnearest10
+x = head -n $i+$j+1 /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 1
+y = head -n $i+$j+1 /home/position.log |  tail -n 1 | tail -c +22 | tail -c 22 | cut -d " " -f 2
+let  "z = ($x-28.7041)*($x-28.7041) + ($y-77.1025)*($y-77.1025)"
+echo "$z" >> tmpnearest10
+printf "\n" >> tmpnearest10
+fi
+
+done
+
+sort -k 2 tmpnearest10 | head -n 10 > nearest10
+
+rm tmpnearest10
